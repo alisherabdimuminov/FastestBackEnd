@@ -3,14 +3,14 @@ from rest_framework import generics
 from rest_framework import decorators
 from rest_framework.response import Response
 
-from .models import Question, Spec, Test
+from .models import Question, Set, Test
 from .serializers import (
     TestModelSerializer, 
     QuestionModelSerializer, 
-    SpecModelSerializer,
+    SetModelSerializer,
     CreateTestModelSerializer,
     CreateQuestionModelSerializer,
-    CreateSpecModelSerializer,
+    CreateSetModelSerializer,
 )
 
 # LIST
@@ -25,9 +25,9 @@ class QuestionListAPIView(generics.ListAPIView):
     serializer_class = QuestionModelSerializer
 
 
-class SpecsListAPIView(generics.ListAPIView):
-    queryset = Spec.objects.all().order_by("-id")
-    serializer_class = SpecModelSerializer
+class SetsListAPIView(generics.ListAPIView):
+    queryset = Set.objects.all().order_by("-id")
+    serializer_class = SetModelSerializer
 
 
 # ADD
@@ -72,10 +72,10 @@ def add_question(request: HttpRequest):
 
 
 @decorators.api_view(http_method_names=["POST"])
-def add_spec(request: HttpRequest):
-    spec = CreateSpecModelSerializer(data=request.data)
-    if spec.is_valid():
-        spec.create(spec.validated_data)
+def add_set(request: HttpRequest):
+    Set = CreateSetModelSerializer(data=request.data)
+    if Set.is_valid():
+        Set.create(Set.validated_data)
         return Response({
             "status": "success",
             "code": "201",
@@ -123,11 +123,11 @@ def edit_question(request: HttpRequest, pk: int):
     })
 
 @decorators.api_view(http_method_names=["POST"])
-def edit_spec(request: HttpRequest, pk: int):
-    spec_obj = Spec.objects.get(pk=pk)
-    spec = CreateSpecModelSerializer(spec_obj, data=request.data)
-    if spec.is_valid():
-        spec.create(spec.validated_data)
+def edit_set(request: HttpRequest, pk: int):
+    Set_obj = Set.objects.get(pk=pk)
+    Set = CreateSetModelSerializer(Set_obj, data=request.data)
+    if Set.is_valid():
+        Set.create(Set.validated_data)
         return Response({
             "status": "success",
             "code": "201",

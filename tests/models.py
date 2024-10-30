@@ -10,14 +10,17 @@ ANSWER = (
     ("d", "D"),
 )
 STATUS = (
-    ("freeze", "Boshlanmagan"),
+    ("not_started", "Boshlanmagan"),
     ("passed", "O'tgan"),
     ("failed", "Yiqilgan"),
     ("ended", "Tugagan"),
 )
 
+def json():
+    return {}
 
-class Spec(models.Model):
+
+class Set(models.Model):
     name = models.CharField(max_length=100, unique=True)
 
     def __str__(self):
@@ -25,25 +28,31 @@ class Spec(models.Model):
 
 
 class Question(models.Model):
-    spec = models.ForeignKey(Spec, on_delete=models.CASCADE)
+    set = models.ForeignKey(Set, on_delete=models.CASCADE)
     question = models.TextField()
     answer_a = models.TextField()
     answer_b = models.TextField()
     answer_c = models.TextField()
     answer_d = models.TextField()
     correct_answer = models.CharField(max_length=1, choices=ANSWER)
-    score = models.IntegerField(default=1)
+    score = models.IntegerField(default=2)
 
     def __str__(self):
         return self.question
     
 class Test(models.Model):
     name = models.CharField(max_length=100)
-    employee = models.ForeignKey(User, on_delete=models.CASCADE)
-    spec = models.ForeignKey(Spec, on_delete=models.CASCADE)
-    status = models.CharField(max_length=20, null=True, blank=True)
-    score = models.CharField(max_length=100, null=True, blank=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    set = models.ForeignKey(Set, on_delete=models.CASCADE)
+    start_time = models.DateTimeField(null=True, blank=True)
+    duration = models.IntegerField(default=60)
     passed_score = models.IntegerField()
+
+    status = models.CharField(max_length=20, choices=STATUS, default="not_started", null=True, blank=True)
+    percentage = models.DecimalField(max_digits=100, decimal_places=2, default=0, null=True, blank=True)
+    elapsed = models.IntegerField(default=0, null=True, blank=True)
+    cases = models.JSONField(default=json)
+
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
