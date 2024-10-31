@@ -12,6 +12,12 @@ from .views import (
     edit_question,
     edit_set,
     edit_test,
+
+    tests_me,
+    test,
+    set_test_set_time,
+    submit,
+    bulk_create,
 )
 
 
@@ -27,4 +33,10 @@ urlpatterns = [
     path("questions/<int:pk>/edit/", edit_question, name="edit_test"),
     path("sets/<int:pk>/edit/", edit_set, name="edit_set"),
     path("tests/<int:pk>/edit/", edit_test, name="edit_test"),
+
+    path("tests/me/", tests_me, name="test_me"),
+    path("tests/test/<str:uuid>/", test, name="test"),
+    path("tests/test/<str:uuid>/set_start_time/", set_test_set_time, name="set_start_time"),
+    path("tests/test/<str:uuid>/submit/", submit, name="submit"),
+    path("bulk/", bulk_create, name="bulk_create"),
 ]
