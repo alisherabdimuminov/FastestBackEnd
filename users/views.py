@@ -21,7 +21,7 @@ class UsersListAPIView(generics.ListAPIView):
 
 @decorators.api_view(http_method_names=["POST"])
 def add_user(request: HttpRequest):
-    username = generate()
+    username = request.data.get("username")
     first_name = request.data.get("first_name")
     last_name = request.data.get("last_name")
     middle_name = request.data.get("middle_name")
