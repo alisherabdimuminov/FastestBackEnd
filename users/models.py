@@ -34,7 +34,7 @@ class User(AbstractUser):
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
     middle_name = models.CharField(max_length=50)
-    phone = models.CharField(max_length=15)
+    phone = models.CharField(max_length=150)
     branch = models.CharField(max_length=100,null=True, blank=True, choices=BRANCHES, default="Давлат экологик экспертизаси маркази")
     department = models.CharField(max_length=100, null=True, blank=True)
     position = models.CharField(max_length=100, null=True, blank=True)
