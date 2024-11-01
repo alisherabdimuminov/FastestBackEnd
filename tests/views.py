@@ -321,9 +321,27 @@ def print_test_as_pdf(request: HttpRequest, uuid: str):
         case = test_obj.cases[i]
         td += [(str(i), case.get("correct"), case.get("answer"), "To'g'ri" if case.get('status') else "Noto'g'ri")]
     TABLE = [th] + td
-    print(TABLE)
+
+    questions = test_obj.questions.all()
+    questions_html = ""
+    for question in questions:
+        questions_html += f"""
+<li>
+    {cyrillic_to_latin(question.question)}
+    <ol>
+        <li>{cyrillic_to_latin(question.answer_a)}</li>
+        <li>{cyrillic_to_latin(question.answer_b)}</li>
+        <li>{cyrillic_to_latin(question.answer_c)}</li>
+        <li>{cyrillic_to_latin(question.answer_d)}</li>
+    </ol>
+</li>
+"""
+
+    questions_html = f"<ol>{questions_html}</ol>"
     pdf.add_page()
     pdf.set_font("Times", size=16)
+    pdf.write_html(questions_html)
+    pdf.add_page()
     with pdf.table(col_widths=[5, 25, 25, 35]) as table:
         for i, data_row in enumerate(TABLE):
             row = table.row()
