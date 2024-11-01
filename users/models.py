@@ -8,6 +8,7 @@ from .managers import UserManager
 ROLE = (
     ("admin", "Admin"),
     ("user", "Xodim"),
+    ("anonym", "XodimX"),
 )
 BRANCHES = (
     ("Давлат экологик экспертизаси маркази", "Давлат экологик экспертизаси маркази"),
