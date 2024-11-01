@@ -1,11 +1,14 @@
-from datetime import datetime, timezone
 import random
+from datetime import datetime, timezone
+from fpdf import FPDF
 
-from django.http import HttpRequest
+from django.http import HttpRequest, HttpResponse
 from rest_framework import generics
 from rest_framework import decorators
 from rest_framework import permissions
 from rest_framework.response import Response
+
+from utils.translate import cyrillic_to_latin
 
 from .models import Question, Set, Test
 from .serializers import (
@@ -17,6 +20,21 @@ from .serializers import (
     CreateSetModelSerializer,
     TestModelSerializer,
 )
+
+
+class PDF(FPDF):
+    def header(self):
+        # Rendering logo:
+        self.image("logo.png", 5, 5, 15)
+        self.set_font("helvetica", "B", 15)
+        self.cell(80)
+        self.cell(30, 10, "Davlat ekologik ekspertizasi markazi.", align="L")
+        self.ln(20)
+
+    def footer(self):
+        self.set_y(-15)
+        self.set_font("helvetica", "I", 8)
+        self.cell(0, 10, f"Platform powered by Ali", align="C")
 
 # LIST
 
@@ -180,6 +198,8 @@ def set_test_set_time(request: HttpRequest, uuid: str):
             "data": None
         })
     test_obj = test_obj.first()
+    test_obj.status = "started"
+    test_obj.save()
     if not test_obj.start_time:
         test_obj.start_time = start_time
         test_obj.save()
@@ -202,11 +222,17 @@ def submit(request: HttpRequest, uuid: str):
         })
     test_obj = test_obj.first()
     questions = test_obj.questions.all()
-    answer_keys = request.data.get("answers")
+    answer_keys = request.data.get("answers").split(",")
+    if test_obj.questions.count() != len(answer_keys):
+        return Response({
+            "status": "error",
+            "code": "400",
+            "data": None
+        })
     cases = {}
     counter = 1
     percentage = 0
-    for question, answer in zip(questions, answer_keys.split(",")):
+    for question, answer in zip(questions, answer_keys):
         if answer == question.correct_answer:
             cases[f"{counter}"] = {
                 "correct": question.correct_answer,
@@ -277,3 +303,68 @@ def bulk_create(request: HttpRequest):
         question.answer_d = list(shuffled_answers.values())[3]
         question.save()
     return Response()
+
+@decorators.api_view(http_method_names=["GET"])
+def print_test_as_pdf(request: HttpRequest, uuid: str):
+    test_obj = Test.objects.filter(uuid=uuid)
+    if not test_obj:
+        return Response({
+            "status": "error",
+            "code": "404",
+            "data": None
+        })
+    test_obj = test_obj.first()
+    th = tuple(["Savol", "To'g'ri javob", "Javob", "Holati"])
+    td = []
+    pdf = PDF(orientation="landscape")
+    for i in test_obj.cases:
+        case = test_obj.cases[i]
+        td += [(str(i), case.get("correct"), case.get("answer"), "To'g'ri" if case.get('status') else "Noto'g'ri")]
+    TABLE = [th] + td
+    print(TABLE)
+    pdf.add_page()
+    pdf.set_font("Times", size=16)
+    with pdf.table(col_widths=[5, 25, 25, 35]) as table:
+        for i, data_row in enumerate(TABLE):
+            row = table.row()
+            for j, datum in enumerate(data_row):
+                row.cell(datum)
+    response = HttpResponse(content=bytes(pdf.output()), content_type="application/pdf")
+    response["Content-Disposition"] = 'attachment; filename=results.pdf'
+    return response
+
+
+@decorators.api_view(http_method_names=["GET"])
+def print_tests_as_pdf(request: HttpRequest):
+    tests_obj = Test.objects.exclude(status="not_started")
+    tests_obj = tests_obj.exclude(status="started")
+    if not tests_obj:
+        return Response({
+            "status": "error",
+            "code": "404",
+            "data": None
+        })
+    th = tuple(["Nomi", "Ism", "Familiya", "Filial", "Bo'lim", "Lavozimi", "Natija", "Holati"])
+    td = []
+    pdf = PDF(orientation="landscape")
+    for test in tests_obj:
+        status = ""
+        if test.status == "not_started":
+            status = "Boshlanmagan"
+        elif test.status == "passed":
+            status = "O'tgan"
+        elif test.status == "failed":
+            status = "Yiqilgan"
+        td += [(str(test.pk), cyrillic_to_latin(test.user.first_name) , cyrillic_to_latin(test.user.last_name), cyrillic_to_latin(test.user.branch), cyrillic_to_latin(test.user.department), cyrillic_to_latin(test.user.position), f"{test.percentage}%",  status, )]
+    TABLE = [th] + td
+    print(TABLE)
+    pdf.add_page()
+    pdf.set_font("Times", size=16)
+    with pdf.table() as table:
+        for i, data_row in enumerate(TABLE):
+            row = table.row()
+            for j, datum in enumerate(data_row):
+                row.cell(datum)
+    response = HttpResponse(content=bytes(pdf.output()), content_type="application/pdf")
+    response["Content-Disposition"] = 'attachment; filename=results.pdf'
+    return response

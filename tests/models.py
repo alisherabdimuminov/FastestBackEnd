@@ -14,6 +14,7 @@ ANSWER = (
 )
 STATUS = (
     ("not_started", "Boshlanmagan"),
+    ("started", "Boshlangan"),
     ("passed", "O'tgan"),
     ("failed", "Yiqilgan"),
     ("ended", "Tugagan"),
