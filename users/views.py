@@ -119,7 +119,7 @@ def login(request: HttpRequest):
             "uuid": user.uuid.__str__(),
             "username": user.username,
             "first_name": user.first_name,
-            "last_name": user.first_name,
+            "last_name": user.last_name,
             "middle_name": user.middle_name,
             "phone": user.phone,
             "branch": user.branch,
