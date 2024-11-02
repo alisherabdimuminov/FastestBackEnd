@@ -355,16 +355,17 @@ def print_test_as_pdf(request: HttpRequest, uuid: str):
 @decorators.api_view(http_method_names=["GET"])
 def print_tests_as_pdf(request: HttpRequest):
     tests_obj = Test.objects.exclude(status="not_started")
-    tests_obj = tests_obj.exclude(status="started").order_by("percentage")
+    tests_obj = tests_obj.exclude(status="started").order_by("-percentage")
     if not tests_obj:
         return Response({
             "status": "error",
             "code": "404",
             "data": None
         })
-    th = tuple(["Nomi", "Ism Familiya", "Filial", "Bo'lim", "Lavozimi", "Natija", "Holati"])
+    th = tuple(["Nomi", "Ism Familiya", "Filial", "Bo'lim", "Lavozimi", "Natija %", "Holati"])
     td = []
     pdf = PDF(orientation="landscape")
+    counter = 1
     for test in tests_obj:
         status = ""
         if test.status == "not_started":
@@ -373,12 +374,13 @@ def print_tests_as_pdf(request: HttpRequest):
             status = "O'tgan"
         elif test.status == "failed":
             status = "Yiqilgan"
-        td += [(str(test.pk), f"{cyrillic_to_latin(test.user.first_name)} {cyrillic_to_latin(test.user.last_name)}", cyrillic_to_latin(test.user.branch), cyrillic_to_latin(test.user.department), cyrillic_to_latin(test.user.position), f"{test.percentage}%",  status, )]
+        td += [(f"{counter}", f"{cyrillic_to_latin(test.user.first_name)} {cyrillic_to_latin(test.user.last_name)}", cyrillic_to_latin(test.user.branch), cyrillic_to_latin(test.user.department), cyrillic_to_latin(test.user.position), f"{test.percentage}",  status, )]
+        counter += 1
     TABLE = [th] + td
     print(TABLE)
     pdf.add_page()
     pdf.set_font("Times", size=16)
-    with pdf.table(col_widths=[5, 25, 30, 10, 10, 5, 5]) as table:
+    with pdf.table(col_widths=[5, 15, 30, 20, 10, 5, 5]) as table:
         for i, data_row in enumerate(TABLE):
             row = table.row()
             for j, datum in enumerate(data_row):
