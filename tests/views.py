@@ -378,7 +378,7 @@ def print_tests_as_pdf(request: HttpRequest):
     print(TABLE)
     pdf.add_page()
     pdf.set_font("Times", size=16)
-    with pdf.table() as table:
+    with pdf.table(col_widths=[5, 15, 15, 30, 10, 10, 5, 5]) as table:
         for i, data_row in enumerate(TABLE):
             row = table.row()
             for j, datum in enumerate(data_row):
