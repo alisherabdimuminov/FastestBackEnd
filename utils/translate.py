@@ -11,7 +11,7 @@ def cyrillic_to_latin(text):
         'ф': 'f', 'х': 'kh', 'ц': 'ts', 'ч': 'ch', 'ш': 'sh', 'щ': 'shch',
         'ы': 'y', 'э': 'e', 'ю': 'yu', 'я': 'ya', 'ь': '', 'ъ': '',   # Soft and hard signs,
         'Қ': 'Q', 'қ': 'q', 'ў': 'o\'', 'ғ': 'g\'', 'ҳ': 'h', 'Ҳ': 'H', 'Ў': 'O\'', '–': '-',
-        'Ғ': 'G\'',
+        'Ғ': 'G\'', '“': '"',
     }
 
     # Convert each character
