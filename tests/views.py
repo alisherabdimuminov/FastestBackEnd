@@ -166,7 +166,7 @@ def edit_set(request: HttpRequest, pk: int):
 @decorators.permission_classes(permission_classes=[permissions.IsAuthenticated])
 def tests_me(request: HttpRequest):
     user = request.user
-    tests_obj = Test.objects.filter(user__pk=user.pk)
+    tests_obj = Test.objects.filter(user__pk=user.pk).order_by("-id")
     tests = TestsModelSerializer(tests_obj, many=True)
     return Response(tests.data)
 
@@ -189,8 +189,8 @@ def test(request: HttpRequest, uuid: str):
 @decorators.api_view(http_method_names=["POST"])
 @decorators.permission_classes(permission_classes=[permissions.IsAuthenticated])
 def set_test_set_time(request: HttpRequest, uuid: str):
+    now = datetime.now(timezone.utc)
     test_obj = Test.objects.filter(uuid=uuid)
-    start_time = request.data.get("start_time")
     if not test_obj:
         return Response({
             "status": "error",
@@ -201,7 +201,7 @@ def set_test_set_time(request: HttpRequest, uuid: str):
     test_obj.status = "started"
     test_obj.save()
     if not test_obj.start_time:
-        test_obj.start_time = start_time
+        test_obj.start_time = now
         test_obj.save()
     return Response({
         "status": "success",
@@ -212,7 +212,7 @@ def set_test_set_time(request: HttpRequest, uuid: str):
 
 @decorators.api_view(http_method_names=["POST"])
 def submit(request: HttpRequest, uuid: str):
-    now = datetime.now()
+    now = datetime.now(tz=timezone.utc)
     test_obj = Test.objects.filter(uuid=uuid)
     if not test_obj:
         return Response({
@@ -255,7 +255,10 @@ def submit(request: HttpRequest, uuid: str):
     else:
         test_obj.status = "failed"
     if (test_obj.start_time):
-        print(now.replace(tzinfo=timezone.utc), test_obj.start_time.timetz().tzinfo)
+        print(test_obj.start_time)
+        print(now)
+        print(now - test_obj.start_time)
+        test_obj.elapsed = (now - test_obj.start_time).total_seconds()
     test_obj.percentage = percentage
     test_obj.cases = cases
     test_obj.save()
