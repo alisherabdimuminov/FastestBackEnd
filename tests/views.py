@@ -272,6 +272,8 @@ def submit(request: HttpRequest, uuid: str):
 @decorators.api_view(http_method_names=["POST"])
 def bulk_create(request: HttpRequest):
     raw_questions = request.data.get("raw")
+    set_pk = request.data.get("set")
+    set = Set.objects.get(pk=set_pk)
     for raw_q in raw_questions.split("\n\n"):
         q = raw_q.split("\n")
         content = q[0]
@@ -289,7 +291,6 @@ def bulk_create(request: HttpRequest):
         random.shuffle(items)
         shuffled_answers = dict(items)
         print(shuffled_answers)
-        set = Set.objects.first()
         question = Question.objects.create(
             question=content,
             set=set
