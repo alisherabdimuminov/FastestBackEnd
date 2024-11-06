@@ -1,19 +1,19 @@
 from django.contrib import admin
-# from unfold.admin import ModelAdmin
+from unfold.admin import ModelAdmin
 
 from .models import Set, Question, Test
 
 
 @admin.register(Set)
-class SetModelAdmin(admin.ModelAdmin):
+class SetModelAdmin(ModelAdmin):
     list_display = ["name"]
 
 
 @admin.register(Question)
-class QuestionModelAdmin(admin.ModelAdmin):
+class QuestionModelAdmin(ModelAdmin):
     list_display = ["question", "set", "correct_answer", ]
 
 
 @admin.register(Test)
-class TestModelAdmin(admin.ModelAdmin):
+class TestModelAdmin(ModelAdmin):
     list_display = ["name", "user", "set", "count_q", ]
