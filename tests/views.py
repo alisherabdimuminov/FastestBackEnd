@@ -403,7 +403,7 @@ def print_users_as_pdf(request: HttpRequest):
     pdf = PDF(orientation="landscape")
     counter = 1
     for user in users_obj:
-        td += [(f"{counter}", f"{user.username}", f"{user.first_name} {user.last_name}", "********" )]
+        td += [(f"{counter}", f"{user.username}", f"{cyrillic_to_latin(user.first_name)} {cyrillic_to_latin(user.last_name)}", "********" )]
         counter += 1
     TABLE = [th] + td
     pdf.add_page()
