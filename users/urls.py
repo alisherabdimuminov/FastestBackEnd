@@ -15,5 +15,5 @@ urlpatterns = [
     path("add/", add_user, name="add_user"),
     path("<str:uuid>/edit/", edit_user, name="edit_user"),
     path("login/", login, name="login"),
-    path("users/pdf/", print_users_as_pdf, name="print_users"),
+    path("pdf/", print_users_as_pdf, name="print_users"),
 ]
