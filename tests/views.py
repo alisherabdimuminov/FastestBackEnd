@@ -398,12 +398,12 @@ def print_tests_as_pdf(request: HttpRequest):
 @decorators.api_view(http_method_names=["GET"])
 def print_users_as_pdf(request: HttpRequest):
     users_obj = User.objects.filter(role="user")
-    th = tuple(["ID", "Login", "Ism Familiya", "Parol"])
+    th = tuple(["ID", "Login", "Parol"])
     td = []
     pdf = PDF(orientation="landscape")
     counter = 1
     for user in users_obj:
-        td += [(f"{counter}", f"{cyrillic_to_latin(user.username)}", f"{cyrillic_to_latin(user.first_name)} {cyrillic_to_latin(user.last_name)}", "********" )]
+        td += [(f"{counter}", f"{cyrillic_to_latin(user.username)}", "********" )]
         counter += 1
     TABLE = [th] + td
     pdf.add_page()
