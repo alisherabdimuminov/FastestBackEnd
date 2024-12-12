@@ -408,7 +408,7 @@ def print_users_as_pdf(request: HttpRequest):
     TABLE = [th] + td
     pdf.add_page()
     pdf.set_font("Times", size=16)
-    with pdf.table(col_widths=[5, 15, 30, 20, 10, 5, 5]) as table:
+    with pdf.table() as table:
         for i, data_row in enumerate(TABLE):
             row = table.row()
             for j, datum in enumerate(data_row):
