@@ -9,6 +9,7 @@ from rest_framework import permissions
 from rest_framework.response import Response
 
 from utils.translate import cyrillic_to_latin
+from users.models import User
 
 from .models import Question, Set, Test
 from .serializers import (
@@ -28,7 +29,7 @@ class PDF(FPDF):
         self.image("logo.png", 5, 5, 15)
         self.set_font("helvetica", "B", 15)
         self.cell(80)
-        self.cell(30, 10, "Davlat ekologik ekspertizasi markazi.", align="L")
+        self.cell(30, 10, "O'zbekiston-Finlandiya Pedagogika Instituti.", align="L")
         self.ln(20)
 
     def footer(self):
@@ -391,4 +392,27 @@ def print_tests_as_pdf(request: HttpRequest):
                 row.cell(datum)
     response = HttpResponse(content=bytes(pdf.output()), content_type="application/pdf")
     response["Content-Disposition"] = 'attachment; filename=results.pdf'
+    return response
+
+
+@decorators.api_view(http_method_names=["GET"])
+def print_users_as_pdf(request: HttpRequest):
+    users_obj = User.objects.filter(role="user")
+    th = tuple(["ID", "Login", "Ism Familiya", "Parol"])
+    td = []
+    pdf = PDF(orientation="landscape")
+    counter = 1
+    for user in users_obj:
+        td += [(f"{counter}", f"{user.username}", f"{user.first_name} {user.last_name}", "********" )]
+        counter += 1
+    TABLE = [th] + td
+    pdf.add_page()
+    pdf.set_font("Times", size=16)
+    with pdf.table(col_widths=[5, 15, 30, 20, 10, 5, 5]) as table:
+        for i, data_row in enumerate(TABLE):
+            row = table.row()
+            for j, datum in enumerate(data_row):
+                row.cell(datum)
+    response = HttpResponse(content=bytes(pdf.output()), content_type="application/pdf")
+    response["Content-Disposition"] = 'attachment; filename=users.pdf'
     return response
