@@ -360,14 +360,14 @@ def print_test_as_pdf(request: HttpRequest, uuid: str):
 @decorators.api_view(http_method_names=["GET"])
 def print_tests_as_pdf(request: HttpRequest):
     tests_obj = Test.objects.exclude(status="not_started")
-    tests_obj = tests_obj.exclude(status="started").order_by("-percentage")
+    tests_obj = tests_obj.exclude(status="started")
     if not tests_obj:
         return Response({
             "status": "error",
             "code": "404",
             "data": None
         })
-    th = tuple(["Nomi", "Ism Familiya", "Filial", "Bo'lim", "Lavozimi", "Natija %", "Holati"])
+    th = tuple(["Nomi", "Ism Familiya", "Natija %", "Holati"])
     td = []
     pdf = PDF(orientation="landscape")
     counter = 1
@@ -379,7 +379,7 @@ def print_tests_as_pdf(request: HttpRequest):
             status = "O'tgan"
         elif test.status == "failed":
             status = "Yiqilgan"
-        td += [(f"{counter}", f"{cyrillic_to_latin(test.user.first_name)} {cyrillic_to_latin(test.user.last_name)}", cyrillic_to_latin(test.user.branch), cyrillic_to_latin(test.user.department), cyrillic_to_latin(test.user.position), f"{test.percentage}",  status, )]
+        td += [(f"{counter}", f"{cyrillic_to_latin(test.user.first_name)} {cyrillic_to_latin(test.user.last_name)}", f"{test.percentage}",  status, )]
         counter += 1
     TABLE = [th] + td
     print(TABLE)
