@@ -367,7 +367,7 @@ def print_tests_as_pdf(request: HttpRequest):
             "code": "404",
             "data": None
         })
-    th = tuple(["Nomi", "Ism Familiya", "Natija %", "Holati"])
+    th = tuple(["ID", "Ism Familiya", "Natija %", "Holati"])
     td = []
     pdf = PDF(orientation="landscape")
     counter = 1
@@ -385,7 +385,7 @@ def print_tests_as_pdf(request: HttpRequest):
     print(TABLE)
     pdf.add_page()
     pdf.set_font("Times", size=16)
-    with pdf.table(col_widths=[5, 15, 30, 20, 10, 5, 5]) as table:
+    with pdf.table(col_widths=[5, 35, 30, 30]) as table:
         for i, data_row in enumerate(TABLE):
             row = table.row()
             for j, datum in enumerate(data_row):
