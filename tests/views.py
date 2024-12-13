@@ -379,7 +379,7 @@ def print_tests_as_pdf(request: HttpRequest):
             status = "O'tgan"
         elif test.status == "failed":
             status = "Yiqilgan"
-        td += [(f"{counter}", f"{cyrillic_to_latin(test.user.first_name)} {cyrillic_to_latin(test.user.last_name)}", f"{test.percentage}",  status, )]
+        td += [(f"{counter}", f"{test.user.username}", f"{test.percentage}",  status, )]
         counter += 1
     TABLE = [th] + td
     print(TABLE)
