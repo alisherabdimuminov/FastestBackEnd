@@ -360,7 +360,7 @@ def print_test_as_pdf(request: HttpRequest, uuid: str):
 @decorators.api_view(http_method_names=["GET"])
 def print_tests_as_pdf(request: HttpRequest):
     tests_obj = Test.objects.exclude(status="not_started")
-    tests_obj = tests_obj.exclude(status="started")
+    tests_obj = tests_obj.exclude(status="started").order_by("-percentage")
     if not tests_obj:
         return Response({
             "status": "error",
