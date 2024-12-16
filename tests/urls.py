@@ -20,6 +20,7 @@ from .views import (
     bulk_create,
     print_test_as_pdf,
     print_tests_as_pdf,
+    print_not_users_as_pdf,
 )
 
 
@@ -28,6 +29,7 @@ urlpatterns = [
     path("sets/", SetsListAPIView.as_view(), name="sets"),
     path("tests/", TestsListAPIView.as_view(), name="tests"),
     path("tests/pdf/", print_tests_as_pdf, name="tests_pdf"),
+    path("not_tests/pdf/", print_not_users_as_pdf, name="tests_pdf"),
     
     path("questions/add/", add_question, name="add_question"),
     path("sets/add/", add_set, name="add_set"),
