@@ -416,3 +416,27 @@ def print_users_as_pdf(request: HttpRequest):
     response = HttpResponse(content=bytes(pdf.output()), content_type="application/pdf")
     response["Content-Disposition"] = 'attachment; filename=users.pdf'
     return response
+
+@decorators.api_view(http_method_names=["GET"])
+def print_not_users_as_pdf(request: HttpRequest):
+    users_obj = User.objects.filter(role="user")
+    th = tuple(["ID", "Login", "Parol"])
+    td = []
+    pdf = PDF(orientation="landscape")
+    counter = 1
+    for user in users_obj:
+        test = Test.objects.filter(user=user)
+        if not test:
+            td += [(f"{counter}", f"{cyrillic_to_latin(user.username)}", "********" )]
+        counter += 1
+    TABLE = [th] + td
+    pdf.add_page()
+    pdf.set_font("Times", size=16)
+    with pdf.table() as table:
+        for i, data_row in enumerate(TABLE):
+            row = table.row()
+            for j, datum in enumerate(data_row):
+                row.cell(datum)
+    response = HttpResponse(content=bytes(pdf.output()), content_type="application/pdf")
+    response["Content-Disposition"] = 'attachment; filename=users.pdf'
+    return response
